@@ -1,0 +1,472 @@
+{
+	"info": {
+		"name": "Jamify Tasks API",
+		"description": "Complete CRUD operations for Task Management API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. GET All Tasks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response contains tasks array\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Tasks have required properties\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    if (responseJson.length > 0) {",
+							"        pm.expect(responseJson[0]).to.have.property('id');",
+							"        pm.expect(responseJson[0]).to.have.property('description');",
+							"        pm.expect(responseJson[0]).to.have.property('completed');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks"]
+				},
+				"description": "Retrieve all tasks from the database"
+			}
+		},
+		{
+			"name": "2. GET Task by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Task has correct structure\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('id');",
+							"    pm.expect(responseJson).to.have.property('description');",
+							"    pm.expect(responseJson).to.have.property('completed');",
+							"});",
+							"",
+							"pm.test(\"Task ID matches requested ID\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.id).to.equal(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks/1",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks", "1"]
+				},
+				"description": "Retrieve a specific task by its ID"
+			}
+		},
+		{
+			"name": "3. POST Create New Task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response is JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Created task has ID\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('id');",
+							"    pm.expect(responseJson.id).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Created task has correct description\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.description).to.equal('Postman API Test Task');",
+							"});",
+							"",
+							"pm.test(\"Created task has correct completed status\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.completed).to.equal(false);",
+							"});",
+							"",
+							"// Save the created task ID for later tests",
+							"pm.test(\"Save created task ID\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.globals.set('createdTaskId', responseJson.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Postman API Test Task\",\n    \"completed\": false\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/tasks",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks"]
+				},
+				"description": "Create a new task"
+			}
+		},
+		{
+			"name": "4. PUT Update Task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Updated task has correct description\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.description).to.equal('Updated Postman Test Task');",
+							"});",
+							"",
+							"pm.test(\"Updated task has correct completed status\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.completed).to.equal(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Updated Postman Test Task\",\n    \"completed\": true\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks", "{{createdTaskId}}"]
+				},
+				"description": "Update an existing task"
+			}
+		},
+		{
+			"name": "5. GET Updated Task (Verification)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Task was updated correctly\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.description).to.equal('Updated Postman Test Task');",
+							"    pm.expect(responseJson.completed).to.equal(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks", "{{createdTaskId}}"]
+				},
+				"description": "Verify that the task was updated correctly"
+			}
+		},
+		{
+			"name": "6. DELETE Task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response body is empty\", function () {",
+							"    pm.expect(pm.response.text()).to.equal('');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks", "{{createdTaskId}}"]
+				},
+				"description": "Delete a task"
+			}
+		},
+		{
+			"name": "7. GET Deleted Task (404 Test)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Task was deleted successfully\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks", "{{createdTaskId}}"]
+				},
+				"description": "Verify that the task was deleted (should return 404)"
+			}
+		},
+		{
+			"name": "8. GET Non-existent Task (404 Test)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Non-existent task returns 404\", function () {",
+							"    pm.expect(pm.response.code).to.equal(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks/99999",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks", "99999"]
+				},
+				"description": "Test error handling for non-existent task"
+			}
+		},
+		{
+			"name": "9. POST Invalid Task (Validation Test)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 or 500\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+							"});",
+							"",
+							"pm.test(\"Invalid data is rejected\", function () {",
+							"    pm.expect(pm.response.code).to.not.equal(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"completed\": false\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/tasks",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks"]
+				},
+				"description": "Test validation - create task without description"
+			}
+		},
+		{
+			"name": "10. Final Verification - GET All Tasks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is JSON array\", function () {",
+							"    pm.response.to.be.json;",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Initial test data is still present\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.length).to.be.greaterThan(0);",
+							"});",
+							"",
+							"// Clean up global variable",
+							"pm.globals.unset('createdTaskId');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/tasks",
+					"host": ["{{baseUrl}}"],
+					"path": ["tasks"]
+				},
+				"description": "Final verification that API is working correctly"
+			}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Pre-request script - runs before each request",
+					"console.log('Running request: ' + pm.info.requestName);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script - runs after each request",
+					"pm.test('Response time is acceptable', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+					"});"
+				]
+			}
+		}
+	]
+}
